@@ -37,7 +37,7 @@ class Mc {
 		const mc = clone(this.constructor.DEFAULT);
 		this.#initializeProperties(mc);
 
-		// Merge incoming data into the cloned object (with validation via setters)
+		// Merge incoming data into the class (with validation via setters)
 		this.#deepMerge(this, data);
 
 		// Methods to make class compatible with SugarCube
@@ -70,7 +70,7 @@ class Mc {
 					get: () => source[key],
 					set: (val) => {
 						if (typeof val !== baseType) {
-							throw new TypeError(`Invalid type for ${key}`);
+							throw new TypeError(`Invalid type for ${key}: expected ${baseType}`);
 						}
 						if (baseType === 'number') {
 							const range = limitsDyn[key]?.() ?? limits[key] ?? [0, Infinity];
@@ -123,4 +123,5 @@ class Mc {
 	canDrink() {
 		return this.month.drinkCount < this.constructor.LIMITS.month.drinkCount[1];
 	}
+
 }
