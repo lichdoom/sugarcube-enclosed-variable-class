@@ -61,6 +61,7 @@ class Mc {
 	#defineProperties(source, target, limits = {}, limitsDyn = {}) {
 		for (const key in source) {
 			const baseType = typeof source[key];
+			let range = limits[key] ?? [0, Infinity];
 
 			if (source[key] && baseType === 'object' && !Array.isArray(source[key])) {
 				Object.defineProperty(target, key, { value: Object.create(null) });
@@ -70,10 +71,10 @@ class Mc {
 					get: () => source[key],
 					set: (val) => {
 						if (typeof val !== baseType) {
-							throw new TypeError(`Invalid type for ${key}: expected ${baseType}`);
+							throw new TypeError(`Error in passage "${passage()}". Invalid type for "${key}": expected "${baseType}", got "${typeof val}"`);
 						}
 						if (baseType === 'number') {
-							const range = limitsDyn[key]?.() ?? limits[key] ?? [0, Infinity];
+							if (limitsDyn[key]) range = limitsDyn[key]();
 							source[key] = Math.min(Math.max(val, range[0]), range[1]);
 						} else {
 							source[key] = val;
@@ -92,6 +93,7 @@ class Mc {
 
 			if (tarVal === undefined) {
 				// If the target value doesn't exist, we ignore it
+				continue;
 			} else if (incVal && typeof incVal === 'object' && !Array.isArray(incVal)) {
 				this.#deepMerge(tarVal, incVal);
 			} else {
@@ -123,5 +125,4 @@ class Mc {
 	canDrink() {
 		return this.month.drinkCount < this.constructor.LIMITS.month.drinkCount[1];
 	}
-
 }
