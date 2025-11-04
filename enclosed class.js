@@ -35,7 +35,13 @@ class Mc {
 
 		// Initialize properties with default values and accessors
 		const mc = clone(this.constructor.DEFAULT);
-		this.#initializeProperties(mc);
+		const limitsDyn = {
+			stats: {
+				hp: () => [0, mc.stats.maxhp],
+				spirit: () => [0, mc.stats.maxSpirit],
+			}
+		};
+		this.#defineProperties(mc, this, this.constructor.LIMITS, limitsDyn);
 
 		// Merge incoming data into the class (with validation via setters)
 		this.#deepMerge(this, data);
@@ -47,16 +53,6 @@ class Mc {
 		Object.freeze(this);
 	}
 
-	// Initializes properties by defining getters and setters for each property
-	#initializeProperties(mc) {
-		const limitsDyn = {
-			stats: {
-				hp: () => [0, mc.stats.maxhp],
-				spirit: () => [0, mc.stats.maxSpirit],
-			}
-		};
-		this.#defineProperties(mc, this, this.constructor.LIMITS, limitsDyn);
-	}
 	// Helper function to recursively define properties with validation, limits, and access control
 	#defineProperties(source, target, limits = {}, limitsDyn = {}) {
 		for (const key in source) {
@@ -69,11 +65,12 @@ class Mc {
 			} else {
 				Object.defineProperty(target, key, {
 					get: () => source[key],
-					set: (val) => {
+					set(val) {
 						if (typeof val !== baseType) {
 							throw new TypeError(`Error in passage "${passage()}". Invalid type for "${key}": expected "${baseType}", got "${typeof val}"`);
 						}
 						if (baseType === 'number') {
+							if (!Number.isFinite(val)) throw new TypeError(`Error in passage "${passage()}". Invalid value for "${key}": got "${val}"`);
 							if (limitsDyn[key]) range = limitsDyn[key]();
 							source[key] = Math.min(Math.max(val, range[0]), range[1]);
 						} else {
@@ -91,10 +88,10 @@ class Mc {
 			const incVal = data[key];
 			const tarVal = target[key];
 
-			if (tarVal === undefined) {
-				// If the target value doesn't exist, we ignore it
-				continue;
-			} else if (incVal && typeof incVal === 'object' && !Array.isArray(incVal)) {
+			// If the target value doesn't exist, we ignore it
+			if (tarVal === undefined) continue;
+				
+			if (incVal && typeof incVal === 'object' && !Array.isArray(incVal)) {
 				this.#deepMerge(tarVal, incVal);
 			} else {
 				target[key] = incVal;
