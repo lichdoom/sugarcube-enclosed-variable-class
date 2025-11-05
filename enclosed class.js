@@ -107,8 +107,39 @@ class Mc {
 			if (val && typeof val === 'object') this.#deepFreeze(val);
 		}
 	}
+	static #validateLimits(obj, limits, path = '', errors = []) {
+		for (const key in limits) {
+			const limit = limits[key];
+			const val = obj[key];
+			// Check if the key exists in the object
+			if (!(key in obj)) {
+				errors.push(`"${path + key}" present in LIMITS but missing in DEFAULT`);
+				continue;
+			}
+
+			if (val && typeof val === 'object' && !Array.isArray(val)) {
+				if (limit && typeof limit === 'object' && !Array.isArray(limit)) {
+					this.#validateLimits(val, limit, path + key + '.', errors);
+				} else if (limit) {
+					errors.push(`"${path + key}" defines a range for an object (expected nested limits).`);
+				}
+			}
+			else if (typeof val === 'number') {
+				if (!Array.isArray(limit) || limit.length !== 2) {
+					errors.push(`"${path + key}" is not an array of length 2.`);
+				}
+			} else {
+				errors.push(`"${path + key}" defines a limit for a non-numeric value.`);
+			}
+		}
+		// Only throw once at the root level
+		if (path === '' && errors.length > 0) {
+			throw new Error(`Invalid Mc.LIMITS:\n- ${errors.join('\n- ')}`);
+		}
+	}
 	// Static block to freeze static properties and make them immutable
 	static {
+		this.#validateLimits(this.DEFAULT, this.LIMITS);
 		// Freeze static DEFAULT and LIMITS objects and the class itself
 		for(let obj in this){
 			this.#deepFreeze(this[obj]);
