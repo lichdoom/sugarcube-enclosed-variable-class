@@ -30,9 +30,8 @@ class Mc {
 	};
 
 	constructor(data = {}) {
-		// Ensure the provided data is an object
-		data = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
-
+    if (typeof data !== 'object' || Array.isArray(data)) data = {};
+    
 		// Initialize properties with default values and accessors
 		const mc = clone(this.constructor.DEFAULT);
 		const limitsDyn = {
@@ -56,29 +55,32 @@ class Mc {
 	// Helper function to recursively define properties with validation, limits, and access control
 	#defineProperties(source, target, limits = {}, limitsDyn = {}) {
 		for (const key in source) {
-			const baseType = typeof source[key];
-			let range = limits[key] ?? [0, Infinity];
+			const val = source[key];
+			const type = typeof val;
 
-			if (source[key] && baseType === 'object' && !Array.isArray(source[key])) {
-				Object.defineProperty(target, key, { value: Object.create(null) });
-				this.#defineProperties(source[key], target[key], limits[key], limitsDyn[key]);
-			} else {
-				Object.defineProperty(target, key, {
-					get: () => source[key],
-					set(val) {
-						if (typeof val !== baseType) {
-							throw new TypeError(`Error in passage "${passage()}". Invalid type for "${key}": expected "${baseType}", got "${typeof val}"`);
-						}
-						if (baseType === 'number') {
-							if (!Number.isFinite(val)) throw new TypeError(`Error in passage "${passage()}". Invalid value for "${key}": got "${val}"`);
-							if (limitsDyn[key]) range = limitsDyn[key]();
-							source[key] = Math.min(Math.max(val, range[0]), range[1]);
-						} else {
-							source[key] = val;
-						}
-					}
-				});
+			if (val && type === 'object' && !Array.isArray(val)) {
+				target[key] = Object.create(null);
+				this.#defineProperties(val, target[key], limits[key], limitsDyn[key]);
+				continue;
 			}
+
+			Object.defineProperty(target, key, {
+				get: () => source[key],
+				set(val) {
+					if (typeof val !== type) {
+						throw new TypeError(`Error in passage "${passage()}". Invalid type for "${key}": expected "${type}", got "${typeof val}"`);
+					}
+					if (type === 'number') {
+						if (!Number.isFinite(val)) {
+							throw new TypeError(`Error in passage "${passage()}". Invalid value for "${key}": got "${val}"`);
+						}
+						const range = limitsDyn[key]?.() ?? limits[key] ?? [0, Infinity];
+						source[key] = Math.min(Math.max(val, range[0]), range[1]);
+					} else {
+						source[key] = val;
+					}
+				}
+			});
 		}
 	}
 
@@ -90,7 +92,6 @@ class Mc {
 
 			// If the target value doesn't exist, we ignore it
 			if (tarVal === undefined) continue;
-				
 			if (incVal && typeof incVal === 'object' && !Array.isArray(incVal)) {
 				this.#deepMerge(tarVal, incVal);
 			} else {
