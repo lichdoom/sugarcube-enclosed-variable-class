@@ -30,8 +30,8 @@ class Mc {
 	};
 
 	constructor(data = {}) {
-    if (typeof data !== 'object' || Array.isArray(data)) data = {};
-    
+		if (typeof data !== 'object' || Array.isArray(data)) data = {};
+
 		// Initialize properties with default values and accessors
 		const mc = clone(this.constructor.DEFAULT);
 		const limitsDyn = {
