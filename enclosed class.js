@@ -127,6 +127,8 @@ class Mc {
 			else if (typeof val === 'number') {
 				if (!Array.isArray(limit) || limit.length !== 2) {
 					errors.push(`"${path + key}" is not an array of length 2.`);
+				} else if (limit[0] > limit[1]) {
+					errors.push(`"${path + key}": min > max`);
 				}
 			} else {
 				errors.push(`"${path + key}" defines a limit for a non-numeric value.`);
