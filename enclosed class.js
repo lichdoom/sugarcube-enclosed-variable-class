@@ -36,10 +36,10 @@ setup.Mc = class Mc {
 
 		// Initialize properties with default values and accessors
 		const mc = clone(this.constructor.DEFAULT);
-		setup.defineProperties(mc, this, this.constructor.LIMITS);
+		setup.classes.defineProperties(mc, this, this.constructor.LIMITS);
 
 		// Merge incoming data into the class (with validation via setters)
-		setup.deepMerge(this, data);
+		setup.classes.deepMerge(this, data);
 
 		// Methods to make class compatible with SugarCube
 		this.clone = () => new this.constructor(mc);
@@ -50,10 +50,10 @@ setup.Mc = class Mc {
 
 	// Static block to freeze static properties and make them immutable
 	static {
-		setup.validateLimits(this.DEFAULT, this.LIMITS);
+		setup.classes.validateLimits(this.DEFAULT, this.LIMITS);
 		// Freeze static DEFAULT and LIMITS objects and the class itself
 		for(let obj in this){
-			setup.deepFreeze(this[obj]);
+			setup.classes.deepFreeze(this[obj]);
 		}
 		Object.freeze(this);
 	}
