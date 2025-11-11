@@ -56,7 +56,7 @@ setup.classes = {
 	// Helper function 
 	validateLimits(obj, limits, path = '', errors = []) {
 		for (const key in limits) {
-			const limit = limits[key]?.(obj) ?? limits[key];
+			const limit = typeof limits[key] === 'function' ? limits[key](obj) : limits[key];
 			const val = obj[key];
 			// Check if the key exists in the object
 			if (!(key in obj)) {
