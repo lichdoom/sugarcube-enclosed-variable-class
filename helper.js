@@ -60,7 +60,7 @@ setup.classes = {
 			const val = obj[key];
 			// Check if the key exists in the object
 			if (!(key in obj)) {
-				errors.push(`"${path + key}" present in LIMITS but missing in DEFAULT`);
+				errors.push(`'${path + key}' present in LIMITS but missing in DEFAULT`);
 				continue;
 			}
 
@@ -68,17 +68,17 @@ setup.classes = {
 				if (limit && typeof limit === 'object' && !Array.isArray(limit)) {
 					this.validateLimits(val, limit, path + key + '.', errors);
 				} else if (limit) {
-					errors.push(`"${path + key}" defines a range for an object (expected nested limits).`);
+					errors.push(`'${path + key}' defines a range for an object (expected nested limits).`);
 				}
 			}
 			else if (typeof val === 'number') {
 				if (!Array.isArray(limit) || limit.length !== 2) {
-					errors.push(`"${path + key}" is not an array of length 2.`);
+					errors.push(`'${path + key}' is not an array of length 2.`);
 				} else if (limit[0] > limit[1]) {
-					errors.push(`"${path + key}": min > max`);
+					errors.push(`'${path + key}': min > max`);
 				}
 			} else {
-				errors.push(`"${path + key}" defines a limit for a non-numeric value.`);
+				errors.push(`'${path + key}' defines a limit for a non-numeric value.`);
 			}
 		}
 		// Only throw once at the root level
