@@ -53,7 +53,7 @@ setup.classes = {
 			if (val && typeof val === 'object') this.deepFreeze(val);
 		}
 	},
-	// Helper function 
+	// Helper function to validate limits for objects and values
 	validateLimits(obj, limits, path = '', errors = []) {
 		for (const key in limits) {
 			const limit = typeof limits[key] === 'function' ? limits[key](obj) : limits[key];
@@ -81,7 +81,7 @@ setup.classes = {
 				errors.push(`'${path + key}' defines a limit for a non-numeric value.`);
 			}
 		}
-		// Only throw once at the root level
+		// Throw errors only once at the root level
 		if (path === '' && errors.length > 0) {
 			throw new Error(`Invalid Mc.LIMITS:\n- ${errors.join('\n- ')}`);
 		}

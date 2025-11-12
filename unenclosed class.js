@@ -40,6 +40,7 @@ setup.Mc = class Mc {
 
 		// Merge incoming data into the class (with validation via setters)
 		setup.classes.deepMerge(this, data);
+		Object.freeze(this);
 	}
 
 	// Methods to make class compatible with SugarCube
