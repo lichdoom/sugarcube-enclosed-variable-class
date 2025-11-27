@@ -1,7 +1,7 @@
 # sugarcube-enclosed-variable-class
 Example of a class with input validation via setters using an enclosed/unenclosed variable for Sugarcube.
 
-The DEFAULT, LIMITS, limitsDyn objects and class name can be modified to fit your needs.
+The DEFAULT, LIMITS and class name can be modified to fit your needs.
 
 The enclosed class only works when `Config.history.maxStates = 1;`.
 
