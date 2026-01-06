@@ -21,7 +21,7 @@ setup.classes = {
 						if (!Number.isFinite(val)) {
 							throw new TypeError(`Error in passage '${passage()}'. Invalid value for '${key}': got '${val}'`);
 						}
-						const range = limits[key]?.(source) ?? limits[key] ?? [0, Infinity];
+						const range = typeof limits[key] === 'function' ? limits[key](source) : limits[key] ?? [0, Infinity];
 						source[key] = Math.min(Math.max(val, range[0]), range[1]);
 					} else {
 						source[key] = val;
@@ -56,7 +56,7 @@ setup.classes = {
 	// Helper function to validate limits for objects and values
 	validateLimits(obj, limits, path = '', errors = []) {
 		for (const key in limits) {
-			const limit = limits[key]?.(obj) ?? limits[key];
+			const limit = typeof limits[key] === 'function' ? limits[key](obj) : limits[key];
 			const val = obj[key];
 			// Check if the key exists in the object
 			if (!(key in obj)) {
