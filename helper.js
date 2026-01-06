@@ -86,5 +86,4 @@ setup.classes = {
 			throw new Error(`Invalid Mc.LIMITS:\n- ${errors.join('\n- ')}`);
 		}
 	}
-
 };
