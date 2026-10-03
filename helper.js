@@ -18,7 +18,7 @@ setup.classes = {
 						throw new TypeError(`Error in passage '${passage()}'. Invalid type for '${key}': expected '${type}', got '${typeof val}'`);
 					}
 					if (type === 'number') {
-						if (!Number.isFinite(val)) {
+						if (Number.isNaN(val)) {
 							throw new TypeError(`Error in passage '${passage()}'. Invalid value for '${key}': got '${val}'`);
 						}
 						const range = typeof limits[key] === 'function' ? limits[key](source) : limits[key] ?? [0, Infinity];
@@ -30,9 +30,9 @@ setup.classes = {
 			});
 		}
 	},
-	// Recursive method to deeply merge incoming data into the current object
+	// Helper function to deeply merge incoming data into the current object
 	deepMerge(target, data) {
-		for (const key in data) {
+		for (const key of Object.keys(data)) {
 			const incVal = data[key];
 			const tarVal = target[key];
 
